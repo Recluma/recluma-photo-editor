@@ -7,7 +7,7 @@ app.use(express.json({ limit: '25mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── OpenAI key lives ONLY here, server-side, never sent to the browser ────────
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim().replace(/[^A-Za-z0-9_-]+$/, '');
 
 if (!OPENAI_API_KEY) {
   console.warn('⚠️  WARNING: OPENAI_API_KEY environment variable is not set.');
