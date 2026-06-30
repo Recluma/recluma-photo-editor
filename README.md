@@ -1,44 +1,13 @@
 # Recluma — AI Real Estate Photo Editor
 
-Your OpenAI key is stored **server-side only** as an environment variable.
-It is never sent to the browser, never visible in page source, never logged.
+## 🚀 ONE-TAP DEPLOY
 
-## Deploy in 2 minutes (Vercel)
+Tap this button, sign in with GitHub, paste your OpenAI key when asked, tap Deploy:
 
-```bash
-cd recluma-backend
-npm install
-npx vercel --yes
-```
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Recluma/recluma-photo-editor&env=OPENAI_API_KEY&envDescription=Your%20OpenAI%20API%20key%20for%20photo%20editing&project-name=recluma-photo-editor&repository-name=recluma-photo-editor)
 
-When prompted, or right after deploying, set your environment variable:
+That's it. The deploy button asks you for ONE thing — your OpenAI key — then builds everything automatically.
 
-```bash
-npx vercel env add OPENAI_API_KEY
-```
-
-Paste your OpenAI key when prompted, select "Production", then redeploy:
-
-```bash
-npx vercel --prod --yes
-```
-
-That's it — you'll get a live URL. Open it, upload photos, no key entry needed
-in the browser at all.
-
-## Run locally first (optional, to test)
-
-```bash
-npm install
-export OPENAI_API_KEY=sk-proj-your-key-here
-npm start
-```
-
-Then open http://localhost:3000
-
-## How the security works
-
-- `server.js` reads `OPENAI_API_KEY` from the environment — never from the frontend
-- `public/index.html` has NO API key field — it just uploads photos to `/api/process-photo`
-- The server makes the OpenAI calls and returns only the edited image
-- Your key never touches the browser, network tab, or page source
+## How it works
+- Your OpenAI key is stored server-side on Vercel, never in the browser
+- Upload photos → GPT-4o analyzes → DALL·E 3 regenerates in your chosen style → download
