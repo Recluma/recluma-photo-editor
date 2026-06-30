@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Recluma — Real Estate AI Photo Editor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0B1B2B;--teal:#1B8A7A;--teal-light:#22A896;--gold:#C9963D;--gold-light:#E8B55A;--white:#FFF;--gray:#8A9BAE;--error:#D94F4F;--success:#2ECC71}
+body{background:var(--navy);color:var(--white);font-family:'Inter',sans-serif;min-height:100vh}
+header{padding:22px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.07)}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:1px}.logo span{color:var(--gold)}
+.logo-sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-top:2px}
+.hero{text-align:center;padding:48px 40px 32px}
+.eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+h1{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,48px);font-weight:400;line-height:1.15;max-width:640px;margin:0 auto 14px}
+h1 em{font-style:italic;color:var(--teal-light)}
+.hero p{font-size:14px;color:var(--gray);max-width:460px;margin:0 auto;line-height:1.7}
+.card{max-width:800px;margin:0 auto 60px;padding:0 24px}
+.panel{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:28px 34px;margin-bottom:12px}
+.ptitle{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.ptitle::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.08)}
+label{display:block;font-size:12px;font-weight:500;color:var(--gray);margin-bottom:6px}
+input[type=password],select{width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);border-radius:9px;padding:13px 16px;font-size:14px;color:var(--white);font-family:'Inter',sans-serif;transition:.2s;outline:none;-webkit-appearance:none}
+input:focus,select:focus{border-color:var(--teal);background:rgba(27,138,122,0.08)}
+select option{background:#1a2a3a}
+.frow{margin-bottom:16px}
+.fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.pill-group{display:flex;gap:8px;flex-wrap:wrap}
+.pill{padding:8px 16px;border-radius:100px;border:1.5px solid rgba(255,255,255,0.12);background:transparent;color:var(--gray);font-size:13px;font-weight:500;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
+.pill:hover{border-color:var(--teal-light);color:var(--white)}
+.pill.active{background:var(--teal);border-color:var(--teal);color:var(--white)}
+.slider-wrap{display:flex;align-items:center;gap:12px;margin-top:12px}
+input[type=range]{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--teal-light);border:2px solid white}
+.qval{font-size:17px;font-weight:700;color:var(--teal-light);min-width:40px;text-align:right}
+.infobox{background:rgba(201,150,61,0.1);border:1px solid rgba(201,150,61,0.2);border-radius:9px;padding:12px 15px;font-size:12.5px;color:#d4a84b;line-height:1.7;margin-bottom:16px}
+.infobox a{color:var(--gold-light)}
+/* Drop zone */
+.dropzone{border:2px dashed rgba(255,255,255,0.15);border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:.2s;position:relative;margin-bottom:16px}
+.dropzone:hover,.dropzone.drag{border-color:var(--teal);background:rgba(27,138,122,0.06)}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dz-icon{font-size:40px;margin-bottom:10px}
+.dz-text{font-size:14px;color:var(--gray)}.dz-text strong{color:var(--teal-light)}
+.dz-count{margin-top:10px;font-size:13px;color:var(--success);font-weight:600;display:none}
+.dz-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.dz-thumb{width:70px;height:52px;border-radius:6px;object-fit:cover;border:1.5px solid rgba(255,255,255,0.1)}
+/* Run */
+.btn-run{width:100%;padding:17px;background:linear-gradient(135deg,var(--teal),var(--teal-light));border:none;border-radius:11px;color:white;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.2s;margin-top:4px;letter-spacing:.3px}
+.btn-run:hover{opacity:.9;transform:translateY(-1px)}
+.btn-run:disabled{opacity:.4;cursor:not-allowed;transform:none}
+/* Progress */
+#progress-area{display:none;margin-top:20px}
+.phead{display:flex;justify-content:space-between;margin-bottom:8px}
+.plabel{font-size:12px;color:var(--gray)}.ppct{font-size:13px;font-weight:700;color:var(--teal-light)}
+.pbar-wrap{background:rgba(255,255,255,0.08);border-radius:100px;height:5px;overflow:hidden;margin-bottom:16px}
+.pbar{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-light));width:0%;transition:width .4s ease;border-radius:100px}
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.icard{position:relative;border-radius:9px;overflow:hidden;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);aspect-ratio:4/3}
+.icard img{width:100%;height:100%;object-fit:cover}
+.ist{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(11,27,43,0.82);backdrop-filter:blur(4px);font-size:10px;gap:5px;padding:6px;text-align:center}
+.ist.sd{background:rgba(46,204,113,0.15)}.ist.se{background:rgba(217,79,79,0.18)}
+.iname{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:16px 6px 6px;font-size:9px;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.dp{background:var(--gray)}.dc{background:var(--gold);animation:pulse 1.2s infinite}.dd{background:var(--success)}.de{background:var(--error)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+/* Log */
+#log{background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:12px 14px;max-height:200px;overflow-y:auto;font-family:'Courier New',monospace;font-size:11.5px;color:var(--gray);line-height:1.9}
+#log .ls{color:var(--success)}#log .le{color:#ff7777}#log .li{color:var(--teal-light)}
+/* Results */
+.rbox{background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.2);border-radius:13px;padding:22px;margin-top:16px;display:none}
+.rbox h3{font-size:15px;font-weight:600;color:var(--success);margin-bottom:12px}
+.dllist{display:flex;flex-direction:column;gap:7px}
+.dli{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:rgba(255,255,255,0.04);border-radius:8px}
+.dli span{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%}
+.dli a{color:var(--teal-light);text-decoration:none;font-weight:600;font-size:12px;padding:5px 12px;border:1px solid var(--teal);border-radius:6px;flex-shrink:0}
+.dli a:hover{background:rgba(27,138,122,0.2)}
+.toast{position:fixed;bottom:24px;right:24px;background:#1a2a3a;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 17px;font-size:13px;line-height:1.5;color:white;box-shadow:0 8px 32px rgba(0,0,0,0.5);transform:translateY(14px);opacity:0;transition:.3s;z-index:999;max-width:360px}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:600px){header{padding:14px 18px}.hero{padding:30px 14px 22px}.panel{padding:20px 16px}.fgrid3{grid-template-columns:1fr}.card{padding:0 12px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">REC<span>LUMA</span></div>
+    <div class="logo-sub">AI Real Estate Photo Editor</div>
+  </div>
+  <div style="font-size:11px;color:var(--gray)">GPT-4o Vision · DALL·E 3</div>
+</header>
+
+<div class="hero">
+  <div class="eyebrow">Professional Property Photography</div>
+  <h1>AI Editing for<br/><em>Premium</em> Real Estate Listings</h1>
+  <p>Upload your property photos → choose style → download professionally edited images. Works with any OpenAI account.</p>
+</div>
+
+<div class="card">
+
+  <!-- STEP 1: Upload -->
+  <div class="panel">
+    <div class="ptitle">01 — Upload Your Photos</div>
+    <div class="dropzone" id="dropzone" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
+      <input type="file" id="file-input" accept="image/jpeg,image/jpg,image/png,image/webp" multiple onchange="handleFiles(this.files)"/>
+      <div class="dz-icon">🏠</div>
+      <div class="dz-text"><strong>Click to select photos</strong> or drag & drop here<br/><span style="font-size:11px;margin-top:4px;display:block">JPG · PNG · WebP — multiple files OK</span></div>
+      <div class="dz-count" id="dz-count"></div>
+    </div>
+    <div class="dz-preview" id="dz-preview"></div>
+  </div>
+
+  <!-- STEP 2: Key pre-configured -->
+  <div class="panel">
+    <div class="ptitle">02 — AI Engine</div>
+    <div class="infobox" style="background:rgba(46,204,113,0.08);border-color:rgba(46,204,113,0.2);color:#5dce8a">
+      ✅ <strong>Ready to go.</strong> The AI editor is pre-configured — no key needed. Uses <strong>GPT-4o</strong> to analyze each photo + <strong>DALL·E 3</strong> to regenerate it in your chosen style.
+    </div>
+  </div>
+
+
+  <!-- STEP 3: Settings -->
+  <div class="panel">
+    <div class="ptitle">03 — Export Settings</div>
+    <div class="frow">
+      <label>Aspect Ratio</label>
+      <div class="pill-group" id="ratio-group">
+        <button class="pill active" data-val="1792x1024">▬ 16:9 Landscape</button>
+        <button class="pill" data-val="1024x1792">▮ 9:16 Portrait</button>
+        <button class="pill" data-val="1024x1024">■ 1:1 Square</button>
+      </div>
+    </div>
+    <div class="fgrid3" style="margin-top:16px">
+      <div>
+        <label>Format</label>
+        <select id="format">
+          <option value="jpeg">JPG</option>
+          <option value="png">PNG</option>
+          <option value="webp">WebP</option>
+        </select>
+      </div>
+      <div>
+        <label>Quality — <span id="q-val">90%</span></label>
+        <div class="slider-wrap">
+          <input type="range" id="quality" min="60" max="100" value="90" oninput="document.getElementById('q-val').textContent=this.value+'%'"/>
+        </div>
+      </div>
+      <div>
+        <label>Edit Style</label>
+        <select id="style">
+          <option value="premium">✦ Premium Listing</option>
+          <option value="bright">☀ Bright & Airy</option>
+          <option value="warm">🔆 Warm & Cozy</option>
+          <option value="dramatic">◆ Dramatic / Luxury</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-run" id="run-btn" onclick="startProcessing()">✦ &nbsp; Start Editing Photos</button>
+
+  <div id="progress-area">
+    <div class="phead" style="margin-top:24px">
+      <span class="plabel" id="plabel">Preparing…</span>
+      <span class="ppct" id="ppct">0%</span>
+    </div>
+    <div class="pbar-wrap"><div class="pbar" id="pbar"></div></div>
+    <div class="igrid" id="igrid"></div>
+    <div id="log"></div>
+  </div>
+
+  <div class="rbox" id="rbox">
+    <h3>✓ Editing Complete</h3>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:12px">Download individually or all at once.</p>
+    <div class="dllist" id="dllist"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+let selectedRatio = '1792x1024';
+let uploadedFiles = []; // {name, b64, dataUrl}
+
+// ─── Style prompts (for GPT-4o description step) ──────────────────────────────
+const STYLE_DESC = {
+  premium: 'professional premium real estate photography with perfect color grading, natural daylight white balance, balanced exposure showing both interior details and window views, clean and inviting atmosphere',
+  bright:  'bright and airy real estate photography with lifted shadows, clean neutral-white walls, abundant natural light, modern fresh feel',
+  warm:    'warm and cozy real estate photography with golden-hour tones, enhanced wood textures, soft inviting lighting, homey atmosphere',
+  dramatic:'dramatic luxury real estate photography with rich deep shadows, high contrast, architectural emphasis, editorial magazine quality'
+};
+
+// ─── Dropzone ─────────────────────────────────────────────────────────────────
+function dzOver(e){ e.preventDefault(); document.getElementById('dropzone').classList.add('drag'); }
+function dzLeave(){ document.getElementById('dropzone').classList.remove('drag'); }
+function dzDrop(e){ e.preventDefault(); dzLeave(); handleFiles(e.dataTransfer.files); }
+
+function handleFiles(files){
+  if(!files||!files.length) return;
+  const preview = document.getElementById('dz-preview');
+  Array.from(files).forEach(f => {
+    if(!f.type.startsWith('image/')) return;
+    compressImage(f).then(({b64, dataUrl}) => {
+      uploadedFiles.push({name: f.name, b64, dataUrl});
+      const img = document.createElement('img');
+      img.src = dataUrl; img.className = 'dz-thumb'; img.title = f.name;
+      preview.appendChild(img);
+      const cnt = document.getElementById('dz-count');
+      cnt.textContent = `${uploadedFiles.length} photo${uploadedFiles.length>1?'s':''} ready`;
+      cnt.style.display = 'block';
+    }).catch(err => {
+      toast('Could not load ' + f.name, 'error');
+    });
+  });
+}
+
+// Compress + resize image so the API call doesn't fail on mobile (max 1280px, JPEG)
+function compressImage(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1280;
+        let {width, height} = img;
+        if(width > maxDim || height > maxDim){
+          if(width > height){ height = Math.round(height * maxDim / width); width = maxDim; }
+          else { width = Math.round(width * maxDim / height); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        resolve({ b64: dataUrl.split(',')[1], dataUrl });
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ─── Ratio pills ──────────────────────────────────────────────────────────────
+document.querySelectorAll('#ratio-group .pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('#ratio-group .pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    selectedRatio = p.dataset.val;
+  });
+});
+
+// ─── UI helpers ───────────────────────────────────────────────────────────────
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = type==='error'?'rgba(217,79,79,.5)':type==='ok'?'rgba(46,204,113,.4)':'rgba(255,255,255,.1)';
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 5000);
+}
+
+function log(msg, type=''){
+  const el = document.getElementById('log');
+  const d = document.createElement('div'); d.className = type?`l${type}`:'';
+  const ts = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  d.textContent = `[${ts}] ${msg}`; el.appendChild(d); el.scrollTop = el.scrollHeight;
+}
+
+function setProgress(pct, label){
+  document.getElementById('pbar').style.width = pct+'%';
+  document.getElementById('ppct').textContent = pct+'%';
+  if(label) document.getElementById('plabel').textContent = label;
+}
+
+function createCard(img){
+  const el = document.createElement('div'); el.className='icard'; el.id=`ic-${img.id}`;
+  el.innerHTML = `<img src="${img.dataUrl}" alt="${img.name}"/>
+    <div class="ist" id="is-${img.id}"><div class="dot dp"></div><span style="color:var(--gray)">Waiting</span></div>
+    <div class="iname">${img.name}</div>`;
+  return el;
+}
+
+function setStatus(id, state, label){
+  const s = document.getElementById(`is-${id}`); if(!s) return;
+  const dot = {c:'dc',d:'dd',e:'de',p:'dp'}[state]||'dp';
+  const col = {c:'var(--gold)',d:'var(--success)',e:'var(--error)',p:'var(--gray)'}[state];
+  s.className = `ist${state==='d'?' sd':state==='e'?' se':''}`;
+  s.innerHTML = `<div class="dot ${dot}"></div><span style="color:${col}">${label}</span>`;
+}
+
+function setCardImg(id, b64, fmt){
+  const c = document.getElementById(`ic-${id}`); if(!c) return;
+  c.querySelector('img').src = `data:image/${fmt==='jpeg'?'jpeg':fmt};base64,${b64}`;
+}
+
+// ─── Core: GPT-4o analyze → DALL-E 3 generate ────────────────────────────────
+// ─── Core: calls our backend, which holds the OpenAI key securely ────────────
+async function processImage(b64, name, style, size){
+  log(`  Sending to AI server…`);
+  let resp;
+  try {
+    resp = await fetch('/api/process-photo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageB64: b64, style, size })
+    });
+  } catch(netErr) {
+    throw new Error(`Could not reach server [${netErr.message}]`);
+  }
+  const data = await resp.json();
+  if(!resp.ok) throw new Error(data.error || `Server error ${resp.status}`);
+  return data.b64;
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+async function startProcessing(){
+
+  const format = document.getElementById('format').value;
+  const style  = document.getElementById('style').value;
+
+  if(uploadedFiles.length === 0)
+    return toast('Add at least one photo first', 'error');
+
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true; btn.textContent = '⌛  Processing…';
+
+  document.getElementById('progress-area').style.display = 'block';
+  document.getElementById('rbox').style.display = 'none';
+  document.getElementById('log').innerHTML = '';
+  document.getElementById('igrid').innerHTML = '';
+
+  const downloads = [];
+
+  try {
+    setProgress(4, `Processing ${uploadedFiles.length} photo(s)…`);
+    log(`Starting — ${uploadedFiles.length} photo(s), style: ${style}, ratio: ${selectedRatio}`, 'i');
+
+    const grid = document.getElementById('igrid');
+    const items = uploadedFiles.map((f, i) => ({...f, id: 'img'+i}));
+    items.forEach(img => grid.appendChild(createCard(img)));
+    grid.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+    const step = 90 / items.length;
+
+    for(let i = 0; i < items.length; i++){
+      const img = items[i];
+      const n = `[${i+1}/${items.length}] ${img.name}`;
+      log(`\n${n}`, 'i');
+      setStatus(img.id, 'c', 'Analyzing…');
+
+      let editedB64;
+      try {
+        editedB64 = await processImage(img.b64, img.name, style, selectedRatio);
+        log(`  ✓ Edit complete!`, 's');
+        setStatus(img.id, 'd', '✓ Done');
+        setCardImg(img.id, editedB64, format);
+
+        const ext = format === 'jpeg' ? 'jpg' : format;
+        const base = img.name.replace(/\.[^.]+$/, '');
+        downloads.push({ name: `${base}_edited.${ext}`, b64: editedB64, format });
+
+      } catch(e) {
+        log(`  ✗ Failed: ${e.message}`, 'e');
+        setStatus(img.id, 'e', 'Failed');
+        // Don't throw — continue with next photo
+      }
+
+      setProgress(Math.round(4 + (i+1) * step), `Done ${i+1}/${items.length}…`);
+    }
+
+    setProgress(100, `Complete — ${downloads.length}/${items.length} edited`);
+
+    if(downloads.length === 0){
+      log('\n✗ All photos failed. Check the errors above for details.', 'e');
+      toast('Editing failed — see log for the exact error message', 'error');
+      return;
+    }
+
+    log(`\n✓ ${downloads.length} photo(s) ready to download!`, 's');
+
+    // Build results
+    const dllist = document.getElementById('dllist');
+    dllist.innerHTML = '';
+    downloads.forEach(dl => {
+      const mime = dl.format==='jpeg'?'image/jpeg':dl.format==='png'?'image/png':'image/webp';
+      const bytes = Uint8Array.from(atob(dl.b64), c => c.charCodeAt(0));
+      const url = URL.createObjectURL(new Blob([bytes], {type: mime}));
+      const item = document.createElement('div'); item.className = 'dli';
+      item.innerHTML = `<span>📷 ${dl.name}</span><a href="${url}" download="${dl.name}">Download</a>`;
+      dllist.appendChild(item);
+    });
+
+    if(downloads.length > 1){
+      const allBtn = document.createElement('button');
+      allBtn.textContent = `⬇  Download All ${downloads.length} Photos`;
+      allBtn.style.cssText = 'margin-top:12px;width:100%;padding:13px;background:var(--teal);border:none;border-radius:9px;color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;';
+      allBtn.onclick = () => dllist.querySelectorAll('a').forEach((a,i) => setTimeout(()=>a.click(), i*600));
+      dllist.appendChild(allBtn);
+    }
+
+    document.getElementById('rbox').style.display = 'block';
+    document.getElementById('rbox').scrollIntoView({behavior:'smooth', block:'nearest'});
+    toast(`${downloads.length} photo(s) edited successfully!`, 'ok');
+
+  } catch(e) {
+    log('Unexpected error: ' + e.message, 'e');
+    toast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✦  Start Editing Photos';
+  }
+}
+</script>
+</body>
+</html>
