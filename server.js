@@ -44,6 +44,32 @@ async function supabaseRpc(fnName, args) {
   return data;
 }
 
+app.post('/api/signup', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+  if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  try {
+    // Create user with admin API, email pre-confirmed (no confirmation needed)
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`
+      },
+      body: JSON.stringify({ email, password, email_confirm: true })
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      const msg = data.msg || data.error_description || data.error || 'Signup failed';
+      return res.status(resp.status).json({ error: msg });
+    }
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.post('/api/me', async (req, res) => {
   const user = await getUserFromToken(req.body.token);
   if (!user) return res.status(401).json({ error: 'Not signed in' });

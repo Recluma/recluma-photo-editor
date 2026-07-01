@@ -266,17 +266,20 @@ async function emailAuth() {
 
   try {
     if (authMode === 'signup') {
-      const { data, error } = await sb.auth.signUp({ email, password });
+      // Use server signup which auto-confirms the email
+      const signupResp = await fetch('/api/signup', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email, password })
+      });
+      const signupData = await signupResp.json();
+      if (!signupResp.ok) throw new Error(signupData.error || 'Signup failed');
+      // Now sign in immediately
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      if (data.session) {
-        // Signed up and logged in
-        currentToken = data.session.access_token;
-        currentProfile = await loadProfile(currentToken);
-        showApp();
-      } else {
-        toast('Account created! Check your email to confirm, then sign in.', 'ok');
-        toggleAuthMode();
-      }
+      currentToken = data.session.access_token;
+      currentProfile = await loadProfile(currentToken);
+      showApp();
+      toast('Welcome! You have 5 free credits.', 'ok');
     } else {
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) throw error;
